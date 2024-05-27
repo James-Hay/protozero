@@ -132,26 +132,17 @@ public:
     // Do not rely on anything beyond this point
 
     void append(const char* data, std::size_t count) {
-        if (m_size + count > m_capacity) {
-            throw std::length_error{"fixed size data store exhausted"};
-        }
         std::copy_n(data, count, m_data + m_size);
         m_size += count;
     }
 
     void append_zeros(std::size_t count) {
-        if (m_size + count > m_capacity) {
-            throw std::length_error{"fixed size data store exhausted"};
-        }
         std::fill_n(m_data + m_size, count, '\0');
         m_size += count;
     }
 
     void resize(std::size_t size) {
         protozero_assert(size < m_size);
-        if (size > m_capacity) {
-            throw std::length_error{"fixed size data store exhausted"};
-        }
         m_size = size;
     }
 
@@ -169,9 +160,6 @@ public:
     }
 
     void push_back(char ch) {
-        if (m_size >= m_capacity) {
-            throw std::length_error{"fixed size data store exhausted"};
-        }
         m_data[m_size++] = ch;
     }
 /// @endcond

@@ -89,9 +89,6 @@ class pbf_reader {
     iterator_range<const_fixed_iterator<T>> packed_fixed() {
         protozero_assert(tag() != 0 && "call next() before accessing field value");
         const auto len = get_len_and_skip();
-        if (len % sizeof(T) != 0) {
-            throw invalid_length_exception{};
-        }
         return {const_fixed_iterator<T>(m_data - len),
                 const_fixed_iterator<T>(m_data)};
     }
@@ -113,9 +110,6 @@ class pbf_reader {
     }
 
     void skip_bytes(pbf_length_type len) {
-        if (m_end - m_data < static_cast<ptrdiff_t>(len)) {
-            throw end_of_buffer_exception{};
-        }
         m_data += len;
 
 #ifndef NDEBUG
@@ -291,9 +285,6 @@ public:
 
         // tags 0 and 19000 to 19999 are not allowed as per
         // https://developers.google.com/protocol-buffers/docs/proto#assigning-tags
-        if (m_tag == 0 || (m_tag >= 19000 && m_tag <= 19999)) {
-            throw invalid_tag_exception{};
-        }
 
         m_wire_type = pbf_wire_type(value & 0x07U);
         switch (m_wire_type) {
@@ -303,7 +294,7 @@ public:
             case pbf_wire_type::fixed32:
                 break;
             default:
-                throw unknown_pbf_wire_type_exception{};
+                break;
         }
 
         return true;
