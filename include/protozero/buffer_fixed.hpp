@@ -132,17 +132,26 @@ public:
     // Do not rely on anything beyond this point
 
     void append(const char* data, std::size_t count) {
+        if (m_size + count > m_capacity) {
+            return;
+        }
         std::copy_n(data, count, m_data + m_size);
         m_size += count;
     }
 
     void append_zeros(std::size_t count) {
+        if (m_size + count > m_capacity) {
+            return;
+        }
         std::fill_n(m_data + m_size, count, '\0');
         m_size += count;
     }
 
     void resize(std::size_t size) {
         protozero_assert(size < m_size);
+        if (size > m_capacity) {
+            return;
+        }
         m_size = size;
     }
 
@@ -160,6 +169,9 @@ public:
     }
 
     void push_back(char ch) {
+        if (m_size >= m_capacity) {
+            return;
+        }
         m_data[m_size++] = ch;
     }
 /// @endcond

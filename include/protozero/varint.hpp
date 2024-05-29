@@ -50,12 +50,16 @@ namespace detail {
                 b = *p++; val |= ((uint64_t(b) & 0x7fU) << 49U); if (b >= 0) { break; }
                 b = *p++; val |= ((uint64_t(b) & 0x7fU) << 56U); if (b >= 0) { break; }
                 b = *p++; val |= ((uint64_t(b) & 0x01U) << 63U); if (b >= 0) { break; }
+                break;
             } while (false);
         } else {
             unsigned int shift = 0;
             while (p != iend && *p < 0) {
                 val |= (uint64_t(*p++) & 0x7fU) << shift;
                 shift += 7;
+            }
+            if (p == iend) {
+                return 0;
             }
             val |= uint64_t(*p++) << shift;
         }
@@ -113,6 +117,14 @@ inline void skip_varint(const char** data, const char* end) {
 
     while (p != iend && *p < 0) {
         ++p;
+    }
+
+    if (p - begin >= max_varint_length) {
+        return;
+    }
+
+    if (p == iend) {
+        return;
     }
 
     ++p;
